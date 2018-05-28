@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusableInTouchMode="true"
+    android:fitsSystemWindows="true">
+
+    <include layout="@layout/toolbar"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.victor.loading.book.BookLoading
+            android:id="@+id/loading"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        android:orientation="vertical">
+        <!-- Header view-->
+        <include
+            layout="@layout/item_connected_device"
+            android:id="@+id/header_view"
+            android:visibility="gone"/>
+        <!-- main view-->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:clipToPadding="false"
+            android:scrollbars="none">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+                <!-- iBeacon -->
+                <include
+                    layout="@layout/item_ibeacon_edit"
+                    android:id="@+id/ibeacon_edit"
+                    android:visibility="gone"
+                    />
+                <!-- Radio -->
+                <include
+                    layout="@layout/item_radio_edit"
+                    android:id="@+id/radio_edit"
+                    android:visibility="gone"
+                    />
+                <!-- Radio -->
+                <include
+                    layout="@layout/item_alfa2477s_edit"
+                    android:id="@+id/alfa2477s_edit"
+                    android:visibility="gone"
+                    />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

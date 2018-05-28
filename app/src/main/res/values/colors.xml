@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="myPrimaryDarkColor">#0097A7</color>
+    <color name="myPrimaryColor">#00BCD4</color>
+    <color name="myTextIcons">#FFFFFF</color>
+    <color name="myPrimaryText">#212121</color>
+    <color name="mySecondaryText">#757575</color>
+    <color name="myDividerColor">#BDBDBD</color>
+    <color name="myAccentColor">#FFEB3B</color>
+    <color name="myPrimaryBackground">#E0E0E0</color>
+    <color name="myPrimaryBanner">#8BC34A</color>
+    <color name="myPrimaryTextLight">#10bcc9</color>
+    <color name="myPrimaryCardSmall">#b5ffe1</color>
+    <color name="myPrimaryWhite">#FEFEFE</color>
+    <color name="myPrimaryAlternativeColor">#FF6D00</color>
+    <color name="myDrawerBackground">#FFF</color>
+    <color name="myWindowBackground">#FFF</color>
+    <color name="myTextPrimaryColor">#60656F</color>
+    <color name="myNavigationColor">#000</color>
+    <color name="myConnectedColor">#15CAB1</color>
+    <color name="myDisconnectedColor">#777</color>
+    <color name="myToolbarTextColor">#424242</color>
+
+    <!-- Cards background colors -->
+    <color name="myPrimaryCard">#64B5F6</color>
+    <color name="eddystoneUidBackground">#7986CB</color>
+    <color name='eddystoneUrlBackground'>#4DB6AC</color>
+    <color name="linebeaconBackground">#A1887F</color>
+
+    <!-- Cards text colors -->
+    <color name="myPrimaryCardTitleColor">@android:color/white</color>
+    <color name="myPrimaryCardSubtitleColor">#CCFFFFFF</color>
+    <color name="myPrimaryCardPropertyColor">@android:color/white</color>
+
+    <!-- Cards icon colors -->
+    <color name="myPrimaryCardIconColors">#FFD54F</color>
+    <color name="myPrimaryCardRateStarColor">#FFD54F</color>
+
+    <!-- Swipe layout -->
+    <color name="backgroundColor">#E8E8E0</color>
+    <color name="backgroundColorPress">#DBDBD3</color>
+
+    <color name="dividers">#DADADA</color>
+    <color name="dark_gray">#4c535b</color>
+    <color name="half_black">#808080</color>
+    <color name="red_press">#990000</color>
+    <color name="red">#FF3B00</color>
+
+    <!-- Discovery nearby layout -->
+    <color name="secondarytext" type="color">#ff808080</color>
+
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="mb_white">#ffffff</color>
+    <color name="mb_blue">#ff0099cc</color>
+    <color name="mb_blue_dark">#ff00719b</color>
+    <color name="mb_purple">#ffaa66cc</color>
+    <color name="mb_purple_dark">#ff8855aa</color>
+    <color name="mb_green">#ff99cc00</color>
+    <color name="mb_green_dark">#ff6d9b00</color>
+    <color name="mb_red">#ffff4444</color>
+    <color name="mb_red_dark">#ffcd3a3a</color>
+    <color name="mb_gray">#ffdedede</color>
+
+    <color name="holo_blue_bright">#ff00ddff</color>
+    <color name="holo_green_light">#ff99cc00</color>
+    <color name="holo_orange_light">#ffffbb33</color>
+    <color name="holo_red_light">#ffff4444</color>
+
+</resources>
