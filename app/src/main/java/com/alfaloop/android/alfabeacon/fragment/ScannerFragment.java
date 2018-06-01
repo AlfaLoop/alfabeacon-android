@@ -30,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alfaloop.android.alfabeacon.MainActivity;
@@ -42,6 +43,8 @@ import com.alfaloop.android.alfabeacon.models.LeBeacon;
 import com.alfaloop.android.alfabeacon.utility.ParserUtils;
 import com.alfaloop.android.alfabeacon.utility.ScanFilterUtils;
 import com.alfaloop.android.alfabeacon.utility.UuidUtils;
+import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
+import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
 import com.polidea.rxandroidble2.scan.ScanRecord;
@@ -77,6 +80,8 @@ public class ScannerFragment extends BaseMainFragment {
     private FloatingActionButton mFloatingActionButton;
     private RecyclerViewEmptySupport mRecycleView;
     private View mEmptyView;
+    private ExpandableLinearLayout mExpandableLinearLayout;
+    private RelativeLayout mExpandableButtonLayout;
 
     public static ScannerFragment newInstance() {
         ScannerFragment fragment = new ScannerFragment();
@@ -110,6 +115,27 @@ public class ScannerFragment extends BaseMainFragment {
             }
         });
 
+        mExpandableLinearLayout = (ExpandableLinearLayout)view.findViewById(R.id.expandableLayout);
+        mExpandableLinearLayout.setInRecyclerView(true);
+        mExpandableLinearLayout.setListener(new ExpandableLayoutListenerAdapter() {
+            @Override
+            public void onPreOpen() {
+              
+            }
+
+            @Override
+            public void onPreClose() {
+               
+            }
+        });
+
+        mExpandableButtonLayout = (RelativeLayout)view.findViewById(R.id.expandableButton);
+        mExpandableButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+            }
+        });
+        
         mRecycleView = (RecyclerViewEmptySupport) view.findViewById(R.id.recycle_view);
         mRecycleView.setLayoutManager(new LinearLayoutManager(_mActivity));
         mAdapter = new DeviceAdapter(_mActivity);
@@ -213,6 +239,10 @@ public class ScannerFragment extends BaseMainFragment {
         ScanRecord record = result.getScanRecord();
         if (record == null)
             return;
+
+//        if(result.getRssi() < -58) {
+//            return;
+//        }
 
         String deviceName = record.getDeviceName();
         List<ParcelUuid> advUuids = record.getServiceUuids();

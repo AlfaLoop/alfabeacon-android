@@ -70,5 +70,6 @@ dependencies {
     compile 'com.victor:lib:1.0.4'
     compile 'com.daimajia.androidanimations:library:1.1.2@aar'
     compile 'com.github.dmytrodanylyk:android-morphing-button:98a4986e56' // commit hash
+    compile 'com.github.aakira:expandable-layout:1.6.0@aar'
 
 }

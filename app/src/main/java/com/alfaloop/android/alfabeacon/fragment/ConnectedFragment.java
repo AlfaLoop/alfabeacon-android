@@ -109,6 +109,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private Disposable connectionDisposable;
     private Observable<RxBleConnection> mConnectionObservable;
     private PublishSubject<Boolean> disconnectTriggerSubject = PublishSubject.create();
+    private int mergeProcessCounter = 0;
 
     // GUI components
     private Toolbar mToolbar;
@@ -447,7 +448,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
 
         connectionDisposable = device.establishConnection(false) // <-- autoConnect flag
                 .observeOn(AndroidSchedulers.mainThread())
-                .doFinally(this::dispose)
+                .doFinally(this::onConnectionDispose)
                 .subscribe(this::onConnectionReceived, this::onConnectionFailure);
     }
 
@@ -473,13 +474,18 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
         singles.add(rxBleConnection.writeCharacteristic(mAlfaAppleBeaconMajorCharacteristic, majorArray));
         singles.add(rxBleConnection.writeCharacteristic(mAlfaAppleBeaconMinorCharacteristic, minorArray));
         singles.add(rxBleConnection.writeCharacteristic(mAlfaAppleBeaconTxmCharacteristic, txmArray));
-
+        mergeProcessCounter = 0;
         Single.merge(singles)
-         .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(bytes -> {
-                Log.d(TAG, String.format("update beacon profile Success"));
-                morphToCompleted(iBeaconMorphingButton);
+                Log.d(TAG, String.format("update beacon profile Success %s", ParserUtils.bytesToHex(bytes)));
+                mergeProcessCounter++;
+                if (mergeProcessCounter == singles.size()) {
+                    mergeProcessCounter = 0;
+                    morphToCompleted(iBeaconMorphingButton);
+                }
             }, this::onConnectionFailure);
+
     }
 
     private void morphingRadioButtonClicked() {
@@ -487,19 +493,23 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
         morphToProcess(radioMorphingButton);
         byte[] radioIntervalArray = new byte[2];
         byte[] radioTxPowerArray = new byte[1];
-        radioIntervalArray[0] = (byte)((radioInterval >> 8) & 0xff);
-        radioIntervalArray[1] = (byte)(radioInterval & 0xff);
+        radioIntervalArray[0] = (byte)(radioInterval & 0xff);
+        radioIntervalArray[1] = (byte)((radioInterval >> 8) & 0xff);
         radioTxPowerArray[0] = (byte)radioTxPower;
 
         List<Single<byte[]>> singles = new ArrayList<>();
         singles.add(rxBleConnection.writeCharacteristic(mAlfaRadioIntervalCharacteristic, radioIntervalArray));
         singles.add(rxBleConnection.writeCharacteristic(mAlfaRadioTxPowerCharacteristic, radioTxPowerArray));
-
+        mergeProcessCounter = 0;
         Single.merge(singles)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(bytes -> {
                 Log.d(TAG, String.format("update radio profile Success"));
-                morphToCompleted(radioMorphingButton);
+                mergeProcessCounter++;
+                if (mergeProcessCounter == singles.size()) {
+                    mergeProcessCounter = 0;
+                    morphToCompleted(radioMorphingButton);
+                }
             }, this::onConnectionFailure);
     }
 
@@ -534,6 +544,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private void onConnectionReceived(RxBleConnection connection) {
         // start discovery
         rxBleConnection = connection;
+
         rxBleConnection.discoverServices()
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(rxBleDeviceServices -> {
@@ -586,12 +597,9 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                             rxBleConnection.readCharacteristic(mAlfaRadioIntervalCharacteristic)
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe( value -> {
-//                                        iBeaconTxmEdit.setText(String.format("%d", (int)value[0]));
-                                        int interval = (int)value[1] << 8;
-                                        interval = interval | (int)value[0];
-                                        radioInterval = interval;
-                                        Log.i(TAG, String.format("found Radio interval characteristic %d", interval));
-                                        updateRadioIntervalSeekbar(interval);
+                                        radioInterval = (value[1] & 0xff) * 0x100 + (value[0] & 0xff);
+                                        Log.i(TAG, String.format("found Radio interval characteristic %d", radioInterval));
+                                        updateRadioIntervalSeekbar(radioInterval);
                                     }, this::onConnectionFailure);
                         } else if  (character.getUuid().equals(UUID_ALFA_RADIO_CHARACTER_TXPOWER)) {
                             Log.i(TAG, String.format("found Radio txpower characteristic"));
@@ -599,7 +607,6 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                             rxBleConnection.readCharacteristic(mAlfaRadioTxPowerCharacteristic)
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe( value -> {
-//                                        iBeaconTxmEdit.setText(String.format("%d", (int)value[0]));
                                         int txpower = (int)value[0] ;
                                         radioTxPower = txpower;
                                         Log.i(TAG, String.format("found Radio txpower characteristic %d", txpower));
@@ -675,7 +682,8 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
             .show();
     }
 
-    private void dispose() {
+    private void onConnectionDispose() {
+        Log.d(TAG, "dispose event");
         connectionDisposable = null;
         pop();
     }
@@ -735,13 +743,23 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     }
 
     private void morphToCompleted(final IndeterminateProgressButton btnMorph) {
-        btnMorph.unblockTouch();
-        morphToSuccess(btnMorph);
         Handler handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                morphToSquare(btnMorph, 0);
+                morphToSuccess(btnMorph);
+                Handler handler2 = new Handler();
+//                morphToSquare(btnMorph, 1500);
+//                btnMorph.unblockTouch();
+                handler2.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        morphToSquare(btnMorph, 500);
+                        btnMorph.unblockTouch();
+
+                    }
+                }, 1500);
             }
         }, 1500);
     }

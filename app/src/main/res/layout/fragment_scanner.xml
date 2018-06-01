@@ -7,6 +7,54 @@
     android:fitsSystemWindows="true">
 
     <include layout="@layout/toolbar"/>
+    <!-- Filter Bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout android:id="@+id/expandableButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center">
+            <View android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/triangle"/>
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/expandableButton"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="
+            sample.sample.sample.sample.sample.sample.sample.sample.sample.sample.\n
+            "
+            android:textColor="@color/myPrimaryWhite"
+            android:textSize="12sp"/>
+        <com.github.aakira.expandablelayout.ExpandableLinearLayout
+            android:id="@+id/expandableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="vertical"
+            app:ael_duration="400"
+            app:ael_expanded="false" >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/textView"
+                android:gravity="center"
+                android:text="
+            sample.sample.sample.sample.sample.sample.sample.sample.sample.sample.\n
+            "
+                android:textColor="@color/myPrimaryWhite"
+                android:textSize="16sp" />
+        </com.github.aakira.expandablelayout.ExpandableLinearLayout>
+    </RelativeLayout>
+
     <com.alfaloop.android.alfabeacon.base.RecyclerViewEmptySupport
         android:id="@+id/recycle_view"
         android:layout_width="match_parent"
@@ -23,8 +71,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:tint="@color/colorPrimary"
             app:srcCompat="@drawable/ic_track_changes_black_48dp"
             android:gravity="center"
