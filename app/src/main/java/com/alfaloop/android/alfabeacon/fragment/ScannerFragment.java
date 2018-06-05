@@ -240,7 +240,7 @@ public class ScannerFragment extends BaseMainFragment {
         if (record == null)
             return;
 
-//        if(result.getRssi() < -58) {
+//        if(result.getRssi() < -60) {
 //            return;
 //        }
 
@@ -256,6 +256,7 @@ public class ScannerFragment extends BaseMainFragment {
                 byte[] sdata = record.getServiceData(u);
                 type = (int)sdata[0];
                 battery = (int)sdata[1];
+
 //                Log.i(TAG, ParserUtils.bytesToHex(sdata));
                 break;
             }

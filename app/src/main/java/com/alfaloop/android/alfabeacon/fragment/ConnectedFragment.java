@@ -485,7 +485,6 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                     morphToCompleted(iBeaconMorphingButton);
                 }
             }, this::onConnectionFailure);
-
     }
 
     private void morphingRadioButtonClicked() {
