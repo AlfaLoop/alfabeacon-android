@@ -643,7 +643,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                     alfa2477sView.setVisibility(View.VISIBLE);
                 }
             }
-            if (mAlfaAppleBeaconService == null) {
+            if (mAlfaRadioService == null) {
                 new AlertDialog.Builder(_mActivity)
                         .setMessage(R.string.no_supported_device)
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
