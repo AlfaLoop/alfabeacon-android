@@ -52,14 +52,12 @@
                 <include
                     layout="@layout/item_radio_edit"
                     android:id="@+id/radio_edit"
-                    android:visibility="gone"
-                    />
-                <!-- Radio -->
+                    android:visibility="gone"/>
+                <!-- 2477s -->
                 <include
                     layout="@layout/item_alfa2477s_edit"
                     android:id="@+id/alfa2477s_edit"
-                    android:visibility="gone"
-                    />
+                    android:visibility="gone"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

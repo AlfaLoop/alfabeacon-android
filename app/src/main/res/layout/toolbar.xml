@@ -22,4 +22,9 @@
             android:layout_marginStart="@dimen/keyline_16"
             android:visibility="gone"/>
     </android.support.v7.widget.Toolbar>
+
+    <include
+        layout="@layout/expandablebar"
+        android:id="@+id/expandablebar"
+        android:visibility="gone"/>
 </android.support.design.widget.AppBarLayout>

@@ -15,6 +15,7 @@
  **/
 package com.alfaloop.android.alfabeacon.fragment;
 
+import android.animation.ObjectAnimator;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.os.ParcelUuid;
@@ -29,6 +30,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -45,11 +47,14 @@ import com.alfaloop.android.alfabeacon.utility.ScanFilterUtils;
 import com.alfaloop.android.alfabeacon.utility.UuidUtils;
 import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
+import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
+import com.github.aakira.expandablelayout.Utils;
 import com.polidea.rxandroidble2.RxBleClient;
-import com.polidea.rxandroidble2.RxBleDevice;
 import com.polidea.rxandroidble2.scan.ScanRecord;
 import com.polidea.rxandroidble2.scan.ScanResult;
 import com.polidea.rxandroidble2.scan.ScanSettings;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +72,8 @@ import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
 public class ScannerFragment extends BaseMainFragment {
     public static final String TAG = ScannerFragment.class.getSimpleName();
 
+    private static final String NO_FILTERS = "No filter";
+
     private RxBleClient rxBleClient;
     private HashMap<String, LeBeacon> mLeBeaconHashMap = new HashMap<String, LeBeacon>();
     private UUID ALFABEACON_UUID = UUID.fromString("0000a55a-0000-1000-8000-00805f9b34fb");
@@ -77,11 +84,12 @@ public class ScannerFragment extends BaseMainFragment {
     // GUI component
     private Toolbar mToolbar;
     private ProgressBar mProgressBar;
+    private ExpandableLinearLayout mExpandLayout;
+    private TextView mExpandTitle;
+    private RelativeLayout mExpandButton;
     private FloatingActionButton mFloatingActionButton;
     private RecyclerViewEmptySupport mRecycleView;
     private View mEmptyView;
-    private ExpandableLinearLayout mExpandableLinearLayout;
-    private RelativeLayout mExpandableButtonLayout;
 
     public static ScannerFragment newInstance() {
         ScannerFragment fragment = new ScannerFragment();
@@ -107,6 +115,37 @@ public class ScannerFragment extends BaseMainFragment {
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mToolbar.setTitle(R.string.app_name);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
+
+        // Expandable
+        View expandableView = view.findViewById(R.id.expandablebar);
+        mExpandTitle = (TextView) expandableView.findViewById(R.id.expandableTitleText);
+        mExpandButton = (RelativeLayout) expandableView.findViewById(R.id.buttonRelativeLayout);
+        mExpandLayout = (ExpandableLinearLayout) expandableView.findViewById(R.id.expandableLayout);
+        mExpandTitle.setText(NO_FILTERS);
+
+        mExpandButton.setRotation(0f);
+        mExpandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                mExpandLayout.toggle();
+            }
+        });
+
+        expandableView.setBackgroundColor(ContextCompat.getColor(_mActivity, R.color.myPrimaryWhite));
+        mExpandLayout.setBackgroundColor(ContextCompat.getColor(_mActivity, R.color.myPrimaryWhite));
+        mExpandLayout.setInterpolator(Utils.createInterpolator(Utils.BOUNCE_INTERPOLATOR));
+        mExpandLayout.setListener(new ExpandableLayoutListenerAdapter() {
+            @Override
+            public void onPreOpen() {
+                createRotateAnimator(mExpandButton, 0f, 180f).start();
+            }
+            @Override
+            public void onPreClose() {
+                createRotateAnimator(mExpandButton, 180f, 0f).start();
+            }
+        });
+        expandableView.setVisibility(View.VISIBLE);
+
         mFloatingActionButton = (FloatingActionButton)view.findViewById(R.id.scan_fab);
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,27 +154,6 @@ public class ScannerFragment extends BaseMainFragment {
             }
         });
 
-        mExpandableLinearLayout = (ExpandableLinearLayout)view.findViewById(R.id.expandableLayout);
-        mExpandableLinearLayout.setInRecyclerView(true);
-        mExpandableLinearLayout.setListener(new ExpandableLayoutListenerAdapter() {
-            @Override
-            public void onPreOpen() {
-              
-            }
-
-            @Override
-            public void onPreClose() {
-               
-            }
-        });
-
-        mExpandableButtonLayout = (RelativeLayout)view.findViewById(R.id.expandableButton);
-        mExpandableButtonLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-            }
-        });
-        
         mRecycleView = (RecyclerViewEmptySupport) view.findViewById(R.id.recycle_view);
         mRecycleView.setLayoutManager(new LinearLayoutManager(_mActivity));
         mAdapter = new DeviceAdapter(_mActivity);
@@ -293,5 +311,12 @@ public class ScannerFragment extends BaseMainFragment {
         List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
         mAdapter.updateDatas(valueList);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private ObjectAnimator createRotateAnimator(final View target, final float from, final float to) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(target, "rotation", from, to);
+        animator.setDuration(300);
+        animator.setInterpolator(Utils.createInterpolator(Utils.LINEAR_INTERPOLATOR));
+        return animator;
     }
 }
