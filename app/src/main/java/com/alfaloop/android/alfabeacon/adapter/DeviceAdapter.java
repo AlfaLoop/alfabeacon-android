@@ -191,22 +191,51 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
     private class ItemFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
+            boolean rssiFilterEnable = false;
+            int rssiFilterValue = 0;
+            boolean filterStringEnable = false;
+            String filterStringTag = "";
+
             final List<LeBeacon> list = mItems;
             int count = list.size();
-            String filterString = constraint.toString().toLowerCase();
 
             // parsing the filter String
-
+            String filterString = constraint.toString();
+            String args[] = filterString.split(";");
+            for (String arg : args) {
+                if (arg.contains("dBm")) {
+                    int rssiFilterDbm = arg.length();
+                    rssiFilterDbm = rssiFilterDbm -3;
+                    rssiFilterValue = Integer.parseInt(arg.substring(0, rssiFilterDbm));
+                    rssiFilterEnable = true;
+                } else {
+                    filterStringTag = arg;
+                    filterStringEnable = true;
+                }
+            }
 
             FilterResults results = new FilterResults();
             final ArrayList<LeBeacon> nlist = new ArrayList<LeBeacon>(count);
+            boolean match = false;
             for (int i = 0; i < count; i++) {
-
+                match = false;
                 LeBeacon beacon = list.get(i);
+                if (rssiFilterEnable) {
+                    if (beacon.getRssi() < rssiFilterValue) {
+                        continue;
+                    }
+                }
+                if (filterStringEnable) {
+                    String major = String.valueOf(beacon.getiBeacon().getMajor());
+                    String minor = String.valueOf(beacon.getiBeacon().getMinor());
+                    String uuid = beacon.getiBeacon().getUuid();
+                    if  ( !major.contains(filterStringTag) && !minor.contains(filterStringTag) &&
+                            !uuid.contains(filterStringTag) )
+                    {
+                        continue;
+                    }
+                }
                 nlist.add(beacon);
-//                if (filterableString.toLowerCase().contains(filterString)) {
-//                    nlist.add(filterableString);
-//                }
             }
             results.values = nlist;
             results.count = nlist.size();

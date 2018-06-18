@@ -132,6 +132,24 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         mToolbar.setTitle(R.string.app_name);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
 
+        mAdapter = new DeviceAdapter(_mActivity);
+        mAdapter.setItemClickListener(new DeviceAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                stopScan();
+                List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
+                LeBeacon beacon = valueList.get(position);
+                start(ConnectedFragment.newInstance(beacon));
+            }
+            @Override
+            public void onConnectClick(int position) {
+                stopScan();
+                List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
+                LeBeacon beacon = valueList.get(position);
+                start(ConnectedFragment.newInstance(beacon));
+            }
+        });
+
         // Expandable
         View expandableView = view.findViewById(R.id.expandablebar);
         mExpandTitle = (TextView) expandableView.findViewById(R.id.text_expandable_title);
@@ -149,7 +167,11 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
             @Override
             public void afterTextChanged(Editable editable) {
                 mFilterEditString = mFilterStringEditText.getText().toString();
-                mFilterStringEnable = true;
+                if (mFilterEditString.length() > 0) {
+                    mFilterStringEnable = true;
+                } else {
+                    mFilterStringEnable = false;
+                }
                 updateFilterString();
             }
         });
@@ -159,6 +181,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
             @Override
             public void onClick(View view) {
                 mFilterStringEnable = false;
+                mFilterStringEditText.setText("");
                 updateFilterString();
             }
         });
@@ -222,23 +245,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
 
         mRecycleView = (RecyclerViewEmptySupport) view.findViewById(R.id.recycle_view);
         mRecycleView.setLayoutManager(new LinearLayoutManager(_mActivity));
-        mAdapter = new DeviceAdapter(_mActivity);
-        mAdapter.setItemClickListener(new DeviceAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                stopScan();
-                List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
-                LeBeacon beacon = valueList.get(position);
-                start(ConnectedFragment.newInstance(beacon));
-            }
-            @Override
-            public void onConnectClick(int position) {
-                stopScan();
-                List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
-                LeBeacon beacon = valueList.get(position);
-                start(ConnectedFragment.newInstance(beacon));
-            }
-        });
+
         mRecycleView.setAdapter(mAdapter);
         mEmptyView = (View) view.findViewById(R.id.empty_view);
         mRecycleView.setEmptyView(mEmptyView);
@@ -382,23 +389,23 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         }
     }
 
-    private void updateFilterString () {
+    private void updateFilterString() {
         String filterRssi = mRssiFilterEnable ? String.format("%ddBm;", mRssiFilter) : "" ;
         String filterString = mFilterStringEnable ? mFilterEditString + ";" : "";
         mFilterString = String.format("%s%s", filterString, filterRssi);
         if (mFilterString.length() == 0) {
             mExpandTitle.setText(NO_FILTERS);
+            mAdapter.getFilter().filter("");
         } else {
             mExpandTitle.setText(mFilterString);
-            String 
-//            mAdapter.getFilter().filter(mFilterString);
+            mAdapter.getFilter().filter(mFilterString);
         }
     }
 
     private void updateBeaconList() {
         List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
         mAdapter.updateDatas(valueList);
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
         mAdapter.getFilter().filter(mFilterString);
     }
 
