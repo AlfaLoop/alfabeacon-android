@@ -265,7 +265,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         mCountTimer = Rx2Timer.builder()
             .initialDelay(0)
             .period(1)
-            .take(500)
+            .take(250)
             .unit(TimeUnit.MILLISECONDS)
             .onCount(new Rx2Timer.OnCount() {
                 @Override
@@ -368,10 +368,6 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         if (record == null)
             return;
 
-//        if(result.getRssi() < -60) {
-//            return;
-//        }
-
         String deviceName = record.getDeviceName();
         List<ParcelUuid> advUuids = record.getServiceUuids();
         if (deviceName == null || advUuids == null)
@@ -384,8 +380,6 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
                 byte[] sdata = record.getServiceData(u);
                 type = (int)sdata[0];
                 battery = (int)sdata[1];
-
-//                Log.i(TAG, ParserUtils.bytesToHex(sdata));
                 break;
             }
         }
@@ -411,6 +405,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
                     }
                 }
                 previous.setRssi(result.getRssi());
+                previous.setDatetime(new Date());
                 mLeBeaconHashMap.put(previous.getMacAddress(), previous);
             }
 //            updateBeaconList();
