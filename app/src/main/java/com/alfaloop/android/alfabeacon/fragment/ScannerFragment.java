@@ -25,14 +25,19 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.alfaloop.android.alfabeacon.MainActivity;
@@ -69,7 +74,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
 
-public class ScannerFragment extends BaseMainFragment {
+public class ScannerFragment extends BaseMainFragment implements View.OnFocusChangeListener {
     public static final String TAG = ScannerFragment.class.getSimpleName();
 
     private static final String NO_FILTERS = "No filter";
@@ -81,12 +86,23 @@ public class ScannerFragment extends BaseMainFragment {
     private Disposable scanSubscription;
     private DeviceAdapter mAdapter;
 
+    private String mFilterString = "";
+    private String mFilterEditString = "";
+    private boolean mFilterStringEnable = false;
+    private int mRssiFilter = -100;
+    private boolean mRssiFilterEnable = false;
+
     // GUI component
     private Toolbar mToolbar;
     private ProgressBar mProgressBar;
     private ExpandableLinearLayout mExpandLayout;
     private TextView mExpandTitle;
     private RelativeLayout mExpandButton;
+    private EditText mFilterStringEditText;
+    private ImageButton mFilterStringCancelButton;
+    private SeekBar mRssiFilterSeekBar;
+    private TextView mRssiFilterTextView;
+    private ImageButton mFilterRssiCancelButton;
     private FloatingActionButton mFloatingActionButton;
     private RecyclerViewEmptySupport mRecycleView;
     private View mEmptyView;
@@ -118,11 +134,61 @@ public class ScannerFragment extends BaseMainFragment {
 
         // Expandable
         View expandableView = view.findViewById(R.id.expandablebar);
-        mExpandTitle = (TextView) expandableView.findViewById(R.id.expandableTitleText);
-        mExpandButton = (RelativeLayout) expandableView.findViewById(R.id.buttonRelativeLayout);
-        mExpandLayout = (ExpandableLinearLayout) expandableView.findViewById(R.id.expandableLayout);
-        mExpandTitle.setText(NO_FILTERS);
+        mExpandTitle = (TextView) expandableView.findViewById(R.id.text_expandable_title);
+        mExpandButton = (RelativeLayout) expandableView.findViewById(R.id.relative_layout_expandable_button);
+        mExpandLayout = (ExpandableLinearLayout) expandableView.findViewById(R.id.expandable_layout);
+        mFilterStringEditText = (EditText) expandableView.findViewById(R.id.input_filter_string);
+        mFilterStringEditText.setOnFocusChangeListener(this);
+        mFilterStringEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mFilterEditString = mFilterStringEditText.getText().toString();
+                mFilterStringEnable = true;
+                updateFilterString();
+            }
+        });
 
+        mFilterStringCancelButton = (ImageButton) expandableView.findViewById(R.id.button_filter_string_cancel);
+        mFilterStringCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mFilterStringEnable = false;
+                updateFilterString();
+            }
+        });
+        mRssiFilterTextView = (TextView)expandableView.findViewById(R.id.text_rssi_filter);
+        mFilterRssiCancelButton = (ImageButton) expandableView.findViewById(R.id.button_rssi_filter_cancel);
+        mFilterRssiCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mRssiFilterEnable = false;
+                updateFilterString();
+            }
+        });
+        mRssiFilterSeekBar = (SeekBar) expandableView.findViewById(R.id.seekbar_rssi_filter);
+        mRssiFilterSeekBar.setMax(100);
+        mRssiFilterSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+             @Override
+             public void onStopTrackingTouch(SeekBar seekBar) {}
+             @Override
+             public void onStartTrackingTouch(SeekBar seekBar) {}
+             @Override
+             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)   {
+                  Log.v(TAG, String.format("rssi filter %d", -progress));
+                  mRssiFilterTextView.setText(String.format("%d dBm", -progress));
+                  mRssiFilter = -progress;
+                  mRssiFilterEnable = true;
+                  updateFilterString();
+             }
+        });
+        mRssiFilterSeekBar.setProgress(100);
+        mExpandTitle.setText(NO_FILTERS);
         mExpandButton.setRotation(0f);
         mExpandButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,7 +251,16 @@ public class ScannerFragment extends BaseMainFragment {
 
     private void initDelayView() {
         // Auto start discover nearby devices
+        hideSoftInput();
     }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            hideSoftInput();
+        }
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -307,10 +382,24 @@ public class ScannerFragment extends BaseMainFragment {
         }
     }
 
+    private void updateFilterString () {
+        String filterRssi = mRssiFilterEnable ? String.format("%ddBm;", mRssiFilter) : "" ;
+        String filterString = mFilterStringEnable ? mFilterEditString + ";" : "";
+        mFilterString = String.format("%s%s", filterString, filterRssi);
+        if (mFilterString.length() == 0) {
+            mExpandTitle.setText(NO_FILTERS);
+        } else {
+            mExpandTitle.setText(mFilterString);
+            String 
+//            mAdapter.getFilter().filter(mFilterString);
+        }
+    }
+
     private void updateBeaconList() {
         List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
         mAdapter.updateDatas(valueList);
         mAdapter.notifyDataSetChanged();
+        mAdapter.getFilter().filter(mFilterString);
     }
 
     private ObjectAnimator createRotateAnimator(final View target, final float from, final float to) {

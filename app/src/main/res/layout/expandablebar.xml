@@ -2,12 +2,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_marginTop="2dp"
     android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:id="@+id/buttonRelativeLayout"
+        android:id="@+id/relative_layout_expandable_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
@@ -20,35 +21,111 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/expandableTitleText"
+        android:id="@+id/text_expandable_title"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/buttonRelativeLayout"
+        android:layout_toLeftOf="@id/relative_layout_expandable_button"
         android:gravity="left"
         android:padding="12dp"
         android:textColor="@color/myPrimaryText"
         android:textSize="20sp"/>
 
     <com.github.aakira.expandablelayout.ExpandableLinearLayout
-        android:id="@+id/expandableLayout"
+        android:id="@+id/expandable_layout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@id/expandableTitleText"
+        android:layout_height="300dp"
+        android:layout_below="@id/text_expandable_title"
         android:orientation="vertical"
         app:ael_duration="400"
         app:ael_expanded="false">
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="left"
-            android:padding="16dp"
-            android:text="
-    sample.sample.sample.sample.sample.sample.sample.sample.sample.sample.\n
-    "
-            android:textColor="@color/myPrimaryText"
-            android:textSize="16sp"
-            />
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="8dp"
+                android:textColorHint="@color/myPrimaryText"
+                android:textColorHighlight="@color/myPrimaryText"
+                android:src="@drawable/ic_menu_discover"
+                />
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_filter_string"
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:layout_weight="1">
+                <EditText
+                    android:id="@+id/input_filter_string"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/myPrimaryText"
+                    android:textColorHint="@color/myPrimaryText"
+                    android:textColorHighlight="@color/myPrimaryText"
+                    android:textSize="18sp"
+                    android:hint="Filter by advertising data"
+                    tools:text=""/>
+            </android.support.design.widget.TextInputLayout>
+            <ImageButton
+                android:id="@+id/button_filter_string_cancel"
+                android:layout_weight="0"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="15dp"
+                android:layout_gravity="right"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="8dp"
+                app:srcCompat="@drawable/ic_network_check_black_24dp"
+                android:tint="@color/myPrimaryText" />
+            <SeekBar
+                android:id="@+id/seekbar_rssi_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="4dp"
+                android:maxHeight="2dp"
+                android:minHeight="2dp"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp"
+                android:max="100"
+                android:progressDrawable="@drawable/layer_progress"
+                android:thumb="@drawable/shape_circle" />
+            <TextView
+                android:id="@+id/text_rssi_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_weight="0"
+                android:layout_marginTop="16dp"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/myPrimaryTextLight"
+                android:text="-100 dBm"
+                android:textSize="16dp" />
+            <ImageButton
+                android:id="@+id/button_rssi_filter_cancel"
+                android:layout_weight="0"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="15dp"
+                android:layout_gravity="right"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        </LinearLayout>
     </com.github.aakira.expandablelayout.ExpandableLinearLayout>
 </RelativeLayout>

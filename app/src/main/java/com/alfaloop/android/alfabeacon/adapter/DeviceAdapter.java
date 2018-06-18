@@ -22,6 +22,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,14 +34,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHolder>{
+public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHolder> implements Filterable {
 
     public interface OnItemClickListener {
         void onItemClick(int position);
         void onConnectClick(int position);
     }
 
+    private ItemFilter mFilter = new ItemFilter();
     private List<LeBeacon> mItems = new ArrayList<>();
+    private List<LeBeacon> mFilterItems = new ArrayList<>();
+
     private LayoutInflater mInflater;
     private OnItemClickListener itemClickListener;
 
@@ -49,11 +54,18 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
 
     public void updateDatas(List<LeBeacon> items) {
         mItems.clear();
+        mFilterItems.clear();
         mItems.addAll(items);
+        mFilterItems.addAll(items);
     }
 
     public void setItemClickListener(OnItemClickListener clickListener) {
         this.itemClickListener = clickListener;
+    }
+
+    @Override
+    public Filter getFilter() {
+        return mFilter;
     }
 
     @Override
@@ -65,7 +77,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        LeBeacon item = mItems.get(position);
+        LeBeacon item = mFilterItems.get(position);
 
         if (item.getType() == LeBeacon.LEBEACON_TYPE_AA) {
             holder.imvBeaconType.setImageResource(R.drawable.ic_beacon_alfa_aa);
@@ -127,7 +139,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return mFilterItems.size();
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -175,4 +187,38 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
             tvBattery = (TextView) vBatteryContainer.findViewById(R.id.battery);
         }
     }
+
+    private class ItemFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            final List<LeBeacon> list = mItems;
+            int count = list.size();
+            String filterString = constraint.toString().toLowerCase();
+
+            // parsing the filter String
+
+
+            FilterResults results = new FilterResults();
+            final ArrayList<LeBeacon> nlist = new ArrayList<LeBeacon>(count);
+            for (int i = 0; i < count; i++) {
+
+                LeBeacon beacon = list.get(i);
+                nlist.add(beacon);
+//                if (filterableString.toLowerCase().contains(filterString)) {
+//                    nlist.add(filterableString);
+//                }
+            }
+            results.values = nlist;
+            results.count = nlist.size();
+            return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mFilterItems = (ArrayList<LeBeacon>) results.values;
+            notifyDataSetChanged();
+        }
+    }
+
 }
