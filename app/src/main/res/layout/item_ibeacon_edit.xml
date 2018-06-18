@@ -57,7 +57,7 @@
                 android:textColor="@color/myPrimaryText"
                 android:textColorHint="@color/myAccentColor"
                 android:textSize="14sp"
-                android:hint="Major"
+                android:hint="Major (0~65535)"
                 tools:text="1345"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -75,7 +75,7 @@
                 android:textColor="@color/myPrimaryText"
                 android:textColorHint="@color/myAccentColor"
                 android:textSize="14sp"
-                android:hint="Minor"
+                android:hint="Minor (0~65535)"
                 tools:text="1345"/>
         </android.support.design.widget.TextInputLayout>
 

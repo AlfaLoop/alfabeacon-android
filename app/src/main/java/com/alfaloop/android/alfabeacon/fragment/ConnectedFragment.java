@@ -271,8 +271,38 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
             }
         });
         iBeaconMajorEdit.setText(String.format("1234"));
+        iBeaconMajorEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                int major = Integer.parseInt(iBeaconMajorEdit.getText().toString());
+                if (major < 0 || major > 65535) {
+                    iBeaconMajorEdit.setText("0");
+                }
+            }
+        });
         iBeaconMajorEdit.setOnFocusChangeListener(this);
         iBeaconMinorEdit.setText(String.format("8"));
+        iBeaconMinorEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                int major = Integer.parseInt(iBeaconMinorEdit.getText().toString());
+                if (major < 0 || major > 65535) {
+                    iBeaconMinorEdit.setText("0");
+                }
+            }
+        });
         iBeaconMinorEdit.setOnFocusChangeListener(this);
         iBeaconTxmEdit.setText(String.format("-58"));
         iBeaconTxmEdit.setOnFocusChangeListener(this);
