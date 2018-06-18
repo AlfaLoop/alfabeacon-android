@@ -54,6 +54,7 @@ import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
 import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.github.aakira.expandablelayout.Utils;
+import com.pacific.timer.Rx2Timer;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.scan.ScanRecord;
 import com.polidea.rxandroidble2.scan.ScanResult;
@@ -68,6 +69,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -82,6 +84,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
     private RxBleClient rxBleClient;
     private HashMap<String, LeBeacon> mLeBeaconHashMap = new HashMap<String, LeBeacon>();
     private UUID ALFABEACON_UUID = UUID.fromString("0000a55a-0000-1000-8000-00805f9b34fb");
+    private Rx2Timer mCountTimer = null;
 
     private Disposable scanSubscription;
     private DeviceAdapter mAdapter;
@@ -259,6 +262,29 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
     private void initDelayView() {
         // Auto start discover nearby devices
         hideSoftInput();
+        mCountTimer = Rx2Timer.builder()
+            .initialDelay(0)
+            .period(1)
+            .take(500)
+            .unit(TimeUnit.MILLISECONDS)
+            .onCount(new Rx2Timer.OnCount() {
+                @Override
+                public void onCount(Long count) {
+                }
+            })
+            .onError(new Rx2Timer.OnError() {
+                @Override
+                public void onError(Throwable t) {
+                }
+            })
+            .onComplete(new Rx2Timer.OnComplete() {
+                @Override
+                public void onComplete() {
+                    updateBeaconList();
+                    mCountTimer.restart();
+                }
+            })
+            .build();
     }
 
     @Override
@@ -301,6 +327,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
              mFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.pause_icon));
              mLeBeaconHashMap = new HashMap<String, LeBeacon>();
              updateBeaconList();
+             mCountTimer.start();
 
              scanSubscription = rxBleClient.scanBleDevices(
                      new ScanSettings.Builder()
@@ -325,6 +352,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
 
         if (!scanSubscription.isDisposed()) {
             scanSubscription.dispose();
+            mCountTimer.stop();
             mProgressBar.setVisibility(View.GONE);
             mFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.play_icon));
             return true;
@@ -385,7 +413,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
                 previous.setRssi(result.getRssi());
                 mLeBeaconHashMap.put(previous.getMacAddress(), previous);
             }
-            updateBeaconList();
+//            updateBeaconList();
         }
     }
 
