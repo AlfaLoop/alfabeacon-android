@@ -15,6 +15,7 @@
  **/
 package com.alfaloop.android.alfabeacon.fragment;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.DialogInterface;
@@ -107,8 +108,6 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private RxBleClient rxBleClient;
     private RxBleConnection rxBleConnection;
     private Disposable connectionDisposable;
-    private Observable<RxBleConnection> mConnectionObservable;
-    private PublishSubject<Boolean> disconnectTriggerSubject = PublishSubject.create();
     private int mergeProcessCounter = 0;
 
     // GUI components
@@ -192,9 +191,12 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (connectionDisposable != null)
+//                RxBleDevice rxdevice = rxBleClient.getBleDevice(macAddress);
+//                RxBleConnection.RxBleConnectionState state = rxdevice.getConnectionState();
+//                if (state == )
+                if (connectionDisposable != null) {
                     connectionDisposable.dispose();
-//                _mActivity.onBackPressed();
+                }
             }
         });
 
@@ -280,10 +282,14 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
             }
             @Override
             public void afterTextChanged(Editable editable) {
-                int major = Integer.parseInt(iBeaconMajorEdit.getText().toString());
-                if (major < 0 || major > 65535) {
+               /* if (iBeaconMajorEdit.getText().length() > 0) {
+                    int major = Integer.parseInt(iBeaconMajorEdit.getText().toString());
+                    if (major > 65535) {
+                        iBeaconMajorEdit.setText("65535");
+                    }
+                } else {
                     iBeaconMajorEdit.setText("0");
-                }
+                }*/
             }
         });
         iBeaconMajorEdit.setOnFocusChangeListener(this);
@@ -297,10 +303,14 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
             }
             @Override
             public void afterTextChanged(Editable editable) {
-                int major = Integer.parseInt(iBeaconMinorEdit.getText().toString());
-                if (major < 0 || major > 65535) {
+               /* if (iBeaconMinorEdit.getText().length() > 0) {
+                    int major = Integer.parseInt(iBeaconMinorEdit.getText().toString());
+                    if (major > 65535) {
+                        iBeaconMinorEdit.setText("65535");
+                    }
+                } else {
                     iBeaconMinorEdit.setText("0");
-                }
+                }*/
             }
         });
         iBeaconMinorEdit.setOnFocusChangeListener(this);

@@ -34,11 +34,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHolder> implements Filterable {
+public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHolder> implements Filterable{
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
-        void onConnectClick(int position);
+        void onConnectClick(LeBeacon beacon);
     }
 
     private ItemFilter mFilter = new ItemFilter();
@@ -77,7 +76,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        LeBeacon item = mFilterItems.get(position);
+        final LeBeacon item = mFilterItems.get(position);
 
         if (item.getType() == LeBeacon.LEBEACON_TYPE_AA) {
             holder.imvBeaconType.setImageResource(R.drawable.ic_beacon_alfa_aa);
@@ -106,7 +105,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
             @Override
             public void onClick(View v) {
                 if (itemClickListener != null) {
-                    itemClickListener.onConnectClick(position);
+                    itemClickListener.onConnectClick(item);
                 }
             }
         });
@@ -115,13 +114,21 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
             @Override
             public void onClick(View v) {
                 if (itemClickListener != null) {
-                    itemClickListener.onItemClick(position);
+                    itemClickListener.onConnectClick(item);
                 }
             }
         });
 
         if (item.getiBeacon() != null) {
             holder.vBeaconContainer.setVisibility(View.VISIBLE);
+            holder.vBeaconContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (itemClickListener != null) {
+                        itemClickListener.onConnectClick(item);
+                    }
+                }
+            });
             holder.vIBeacon.setVisibility(View.VISIBLE);
             holder.tvIBeaconUuid.setText(String.format("UUID • %s", item.getiBeacon().getUuid()));
             holder.tvIBeaconMajor.setText(String.format("Major • %d", item.getiBeacon().getMajor()));

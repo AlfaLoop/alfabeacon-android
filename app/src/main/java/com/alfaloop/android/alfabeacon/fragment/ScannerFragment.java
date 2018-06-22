@@ -16,7 +16,11 @@
 package com.alfaloop.android.alfabeacon.fragment;
 
 import android.animation.ObjectAnimator;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattServer;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.support.annotation.Nullable;
@@ -138,17 +142,8 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         mAdapter = new DeviceAdapter(_mActivity);
         mAdapter.setItemClickListener(new DeviceAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onConnectClick(LeBeacon beacon) {
                 stopScan();
-                List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
-                LeBeacon beacon = valueList.get(position);
-                start(ConnectedFragment.newInstance(beacon));
-            }
-            @Override
-            public void onConnectClick(int position) {
-                stopScan();
-                List<LeBeacon> valueList = new ArrayList<LeBeacon>(mLeBeaconHashMap.values());
-                LeBeacon beacon = valueList.get(position);
                 start(ConnectedFragment.newInstance(beacon));
             }
         });
@@ -220,6 +215,9 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
             @Override
             public void onClick(final View v) {
                 mExpandLayout.toggle();
+                if (mExpandLayout.isExpanded()) {
+                    hideSoftInput();
+                }
             }
         });
 
@@ -292,6 +290,11 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         if (!hasFocus) {
             hideSoftInput();
         }
+    }
+
+    @Override
+    public void onSupportVisible() {
+        super.onSupportVisible();
     }
 
     @Override
