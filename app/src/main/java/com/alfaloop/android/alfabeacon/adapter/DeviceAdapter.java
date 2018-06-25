@@ -236,8 +236,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
                     String major = String.valueOf(beacon.getiBeacon().getMajor());
                     String minor = String.valueOf(beacon.getiBeacon().getMinor());
                     String uuid = beacon.getiBeacon().getUuid();
+                    String macAddress = beacon.getMacAddress();
                     if  ( !major.contains(filterStringTag) && !minor.contains(filterStringTag) &&
-                            !uuid.contains(filterStringTag) )
+                            !uuid.contains(filterStringTag) && !macAddress.contains(filterStringTag))
                     {
                         continue;
                     }

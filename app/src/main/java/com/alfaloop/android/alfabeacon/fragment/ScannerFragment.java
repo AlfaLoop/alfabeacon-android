@@ -263,7 +263,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
         mCountTimer = Rx2Timer.builder()
             .initialDelay(0)
             .period(1)
-            .take(250)
+            .take(200)
             .unit(TimeUnit.MILLISECONDS)
             .onCount(new Rx2Timer.OnCount() {
                 @Override

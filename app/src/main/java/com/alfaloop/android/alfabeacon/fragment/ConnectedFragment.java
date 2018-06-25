@@ -88,9 +88,11 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     public final static UUID UUID_ALFA_RADIO_SERVICE = UUID.fromString("19FA0001-F6C2-09A3-E9F9-128ABCA31297");
     public static final UUID UUID_ALFA_RADIO_CHARACTER_INTERVAL = UUID.fromString("19FA0002-F6C2-09A3-E9F9-128ABCA31297");
     public static final UUID UUID_ALFA_RADIO_CHARACTER_TXPOWER = UUID.fromString("19FA0003-F6C2-09A3-E9F9-128ABCA31297");
+    public static final UUID UUID_ALFA_RADIO_CHARACTER_CONN = UUID.fromString("19FA0004-F6C2-09A3-E9F9-128ABCA31297");
     private BluetoothGattService mAlfaRadioService;
     private BluetoothGattCharacteristic mAlfaRadioIntervalCharacteristic;
     private BluetoothGattCharacteristic mAlfaRadioTxPowerCharacteristic;
+    private BluetoothGattCharacteristic mAlfaRadioConnCharacteristic;
 
     /** AlfaBeacon Alfa2477s Service UUID */
     public final static UUID UUID_ALFA_2477S_SERVICE = UUID.fromString("903E0001-F6C2-09A3-E9F9-128ABCA31297");
@@ -109,6 +111,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private RxBleConnection rxBleConnection;
     private Disposable connectionDisposable;
     private int mergeProcessCounter = 0;
+    private boolean disconnecClicked = false;
 
     // GUI components
     private Toolbar mToolbar;
@@ -185,17 +188,29 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
 
     private void initView(View view) {
         // init toolbar
+        disconnecClicked = false;
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mToolbar.setTitle(String.format("%s - %s", getResources().getString(R.string.establish_connection), macAddress));
         mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                RxBleDevice rxdevice = rxBleClient.getBleDevice(macAddress);
-//                RxBleConnection.RxBleConnectionState state = rxdevice.getConnectionState();
-//                if (state == )
-                if (connectionDisposable != null) {
-                    connectionDisposable.dispose();
+                if (disconnecClicked) {
+                    return;
+                }
+                disconnecClicked = true;
+                byte[] disconnect_command = new byte[1];
+                disconnect_command[0] = 0x01;
+                if (mAlfaRadioConnCharacteristic != null && rxBleConnection != null) {
+                    rxBleConnection.writeCharacteristic(mAlfaRadioConnCharacteristic, disconnect_command)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bytes -> {
+                        Log.d(TAG, "disconnected");
+                    });
+                } else {
+                    if (connectionDisposable != null) {
+                       connectionDisposable.dispose();
+                   }
                 }
             }
         });
@@ -651,6 +666,9 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                                         Log.i(TAG, String.format("found Radio txpower characteristic %d", txpower));
                                         updateRadioTxPowerSeekbar(txpower);
                                     }, this::onConnectionFailure);
+                        } else if (character.getUuid().equals(UUID_ALFA_RADIO_CHARACTER_CONN)) {
+                            Log.i(TAG, String.format("found Radio connection characteristic"));
+                            mAlfaRadioConnCharacteristic = character;
                         }
                     }
                     radioView.setVisibility(View.VISIBLE);
@@ -709,20 +727,25 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
 
     private void onConnectionFailure(Throwable throwable) {
         // show the dialog
-        new AlertDialog.Builder(_mActivity)
-            .setMessage(R.string.connect_failure)
-            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (connectionDisposable != null)
-                        connectionDisposable.dispose();
-                }
-            })
-            .show();
+        Log.i(TAG, "onConnectionFailure "+ throwable.toString());
+        if (connectionDisposable != null) {
+            if (!disconnecClicked) {
+                new AlertDialog.Builder(_mActivity)
+                .setMessage(R.string.connect_failure)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (connectionDisposable != null)
+                            connectionDisposable.dispose();
+                    }
+                })
+                .show();
+            }
+        }
     }
 
     private void onConnectionDispose() {
-        Log.d(TAG, "dispose event");
+        Log.d(TAG, "onConnectionDispose");
         connectionDisposable = null;
         pop();
     }
