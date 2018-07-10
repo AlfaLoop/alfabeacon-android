@@ -106,6 +106,11 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private BluetoothGattCharacteristic mAlfa2477SBuzzerCharacteristic;
     private BluetoothGattCharacteristic mAlfa2477SLedCharacteristic;
 
+    /** AlfaBeacon LINE Simple  Service UUID */
+    public final static UUID UUID_ALFA_LINESIMPLEBEACON_SERVICE = UUID.fromString("A78D0001-F6C2-09A3-E9F9-128ABCA31297");
+    public static final UUID UUID_ALFA_LINESIMPLEBEACON_CHARACTER_HWID = UUID.fromString("A78D0002-F6C2-09A3-E9F9-128ABCA31297");
+    public static final UUID UUID_ALFA_LINESIMPLEBEACON_CHARACTER_DM = UUID.fromString("A78D0003-F6C2-09A3-E9F9-128ABCA31297");
+
     // RX Android
     private RxBleClient rxBleClient;
     private RxBleConnection rxBleConnection;
