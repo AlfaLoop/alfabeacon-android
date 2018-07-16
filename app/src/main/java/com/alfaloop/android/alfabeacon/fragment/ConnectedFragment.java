@@ -47,6 +47,7 @@ import com.alfaloop.android.alfabeacon.utility.ParserUtils;
 import com.alfaloop.android.alfabeacon.utility.UuidUtils;
 import com.dd.morphingbutton.MorphingButton;
 import com.dd.morphingbutton.impl.IndeterminateProgressButton;
+import com.github.aakira.expandablelayout.Utils;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -110,6 +111,9 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     public final static UUID UUID_ALFA_LINESIMPLEBEACON_SERVICE = UUID.fromString("A78D0001-F6C2-09A3-E9F9-128ABCA31297");
     public static final UUID UUID_ALFA_LINESIMPLEBEACON_CHARACTER_HWID = UUID.fromString("A78D0002-F6C2-09A3-E9F9-128ABCA31297");
     public static final UUID UUID_ALFA_LINESIMPLEBEACON_CHARACTER_DM = UUID.fromString("A78D0003-F6C2-09A3-E9F9-128ABCA31297");
+    private BluetoothGattService mLSBService;
+    private BluetoothGattCharacteristic mLSBHwidCharacteristic;
+    private BluetoothGattCharacteristic mLSBDmCharacteristic;
 
     // RX Android
     private RxBleClient rxBleClient;
@@ -137,6 +141,12 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private EditText iBeaconMinorEdit;
     private EditText iBeaconTxmEdit;
     private IndeterminateProgressButton iBeaconMorphingButton;
+    // GUI components - Line simple beacon
+    private View     LSBView;
+    private TextView LSBHeaderText;
+    private EditText LSBHwidEdit;
+    private EditText LSBDmEdit;
+    private IndeterminateProgressButton LSBMorphingButton;
     // GUI components - Radio
     private View     radioView;
     private TextView radioIntervalTextView;
@@ -149,7 +159,6 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private TextView alfa2477sRfatteTextView;
     private SeekBar alfa2477sRfatteSeekBar;
     private IndeterminateProgressButton alfa2477sMorphingButton;
-
     // Data
     private String macAddress;
     private String deviceName;
@@ -207,6 +216,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                 byte[] disconnect_command = new byte[1];
                 disconnect_command[0] = 0x01;
                 if (mAlfaRadioConnCharacteristic != null && rxBleConnection != null) {
+                    Log.d(TAG, String.format("AlfaRadioConnCharacteristic != null send disconnect packets"));
                     rxBleConnection.writeCharacteristic(mAlfaRadioConnCharacteristic, disconnect_command)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(bytes -> {
@@ -215,7 +225,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                 } else {
                     if (connectionDisposable != null) {
                        connectionDisposable.dispose();
-                   }
+                    }
                 }
             }
         });
@@ -226,6 +236,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
 
         initHeaderView(view);
         initAppleBeaconView(view);
+        initLSBView(view);
         initRadioView(view);
         initAlfa2477sView(view);
     }
@@ -257,6 +268,60 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
 
     private void updateHeaderRssi(int rssi) {
         mHeaderRssi.setText(String.format("Rssi: %d dBm", rssi));
+    }
+
+    private void initLSBView(View view) {
+        LSBView = (View) view.findViewById(R.id.lsb_edit);
+
+        LSBMorphingButton =  (IndeterminateProgressButton) LSBView.findViewById(R.id.lsb_save_button);
+        LSBMorphingButton.setOnClickListener(this);
+        morphToSquare(LSBMorphingButton, 0);
+
+        LSBHeaderText = (TextView) LSBView.findViewById(R.id.lsb_header_text);
+        LSBHwidEdit = (EditText) LSBView.findViewById(R.id.input_lsb_hwid);
+        LSBDmEdit = (EditText) LSBView.findViewById(R.id.input_lsb_dm);
+
+        LSBHwidEdit.setText("01135373db");
+        LSBHwidEdit.setOnFocusChangeListener(this);
+        LSBHwidEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+               /* if (inputValidation(editable)) {
+                    input_validation.setVisibility(View.VISIBLE);
+                    input_validation.setText("You must enter your Age");
+                } else {
+                    input_validation.setVisibility(View.GONE);
+                    final_input_value = Integer.parseInt(editable.toString());
+                }*/
+            }
+        });
+
+        LSBDmEdit.setText("0102030405060708090A0B0C0D");
+        LSBDmEdit.setOnFocusChangeListener(this);
+        LSBDmEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+               /* if (inputValidation(editable)) {
+                    input_validation.setVisibility(View.VISIBLE);
+                    input_validation.setText("You must enter your Age");
+                } else {
+                    input_validation.setVisibility(View.GONE);
+                    final_input_value = Integer.parseInt(editable.toString());
+                }*/
+            }
+        });
     }
 
     private void initAppleBeaconView(View view) {
@@ -293,6 +358,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
             }
         });
         iBeaconMajorEdit.setText(String.format("1234"));
+        iBeaconMajorEdit.setOnFocusChangeListener(this);
         iBeaconMajorEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -312,8 +378,9 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                 }*/
             }
         });
-        iBeaconMajorEdit.setOnFocusChangeListener(this);
+
         iBeaconMinorEdit.setText(String.format("8"));
+        iBeaconMinorEdit.setOnFocusChangeListener(this);
         iBeaconMinorEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -333,7 +400,6 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                 }*/
             }
         });
-        iBeaconMinorEdit.setOnFocusChangeListener(this);
         iBeaconTxmEdit.setText(String.format("-58"));
         iBeaconTxmEdit.setOnFocusChangeListener(this);
     }
@@ -493,6 +559,8 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     public void onClick(View v) {
         if (v.getId() == R.id.ibeacon_save_button) {
             morphingBeaconButtonClicked();
+        } else if(v.getId() == R.id.lsb_save_button) {
+            morphingLSBButtonClicked();
         } else if(v.getId() == R.id.radio_save_button) {
             morphingRadioButtonClicked();
         } else if(v.getId() == R.id.alfa2477s_save_button) {
@@ -545,6 +613,28 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                     morphToCompleted(iBeaconMorphingButton);
                 }
             }, this::onConnectionFailure);
+    }
+
+    private void morphingLSBButtonClicked() {
+        morphToProcess(LSBMorphingButton);
+
+        byte[] hwidArray = ParserUtils.hexStringToByteArray(LSBHwidEdit.getText().toString());
+        byte[] dmArray = ParserUtils.hexStringToByteArray(LSBDmEdit.getText().toString());
+
+        List<Single<byte[]>> singles = new ArrayList<>();
+        singles.add(rxBleConnection.writeCharacteristic(mLSBHwidCharacteristic, hwidArray));
+        singles.add(rxBleConnection.writeCharacteristic(mLSBDmCharacteristic, dmArray));
+        mergeProcessCounter = 0;
+        Single.merge(singles)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bytes -> {
+                    Log.d(TAG, String.format("update radio profile Success"));
+                    mergeProcessCounter++;
+                    if (mergeProcessCounter == singles.size()) {
+                        mergeProcessCounter = 0;
+                        morphToCompleted(LSBMorphingButton);
+                    }
+                }, this::onConnectionFailure);
     }
 
     private void morphingRadioButtonClicked() {
@@ -704,6 +794,29 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
                         }
                     }
                     alfa2477sView.setVisibility(View.VISIBLE);
+                } else if (service.getUuid().equals(UUID_ALFA_LINESIMPLEBEACON_SERVICE)) {
+                    mLSBService = service;
+                    for (BluetoothGattCharacteristic character: service.getCharacteristics()) {
+                        Log.i(TAG, String.format("character: %s", character.getUuid().toString()));
+                        if (character.getUuid().equals(UUID_ALFA_LINESIMPLEBEACON_CHARACTER_HWID)) {
+                            Log.i(TAG, String.format("found LSB hwid characteristic"));
+                            mLSBHwidCharacteristic = character;
+                            rxBleConnection.readCharacteristic(mLSBHwidCharacteristic)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe( value -> {
+                                LSBHwidEdit.setText(ParserUtils.bytesToHex(value));
+                            }, this::onConnectionFailure);
+                        } else if (character.getUuid().equals(UUID_ALFA_LINESIMPLEBEACON_CHARACTER_DM)) {
+                            Log.i(TAG, String.format("found LSB Device message characteristic"));
+                            mLSBDmCharacteristic = character;
+                            rxBleConnection.readCharacteristic(mLSBDmCharacteristic)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe( value -> {
+                                LSBDmEdit.setText(ParserUtils.bytesToHex(value));
+                            }, this::onConnectionFailure);
+                        }
+                    }
+                    LSBView.setVisibility(View.VISIBLE);
                 }
             }
             if (mAlfaRadioService == null) {
@@ -752,6 +865,7 @@ public class ConnectedFragment extends BaseBackFragment implements View.OnClickL
     private void onConnectionDispose() {
         Log.d(TAG, "onConnectionDispose");
         connectionDisposable = null;
+        mAlfaRadioService = null;
         pop();
     }
 

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/myPrimaryCard"
+    >
+
+    <!-- Proximity HWID -->
+    <ImageView
+        android:id="@+id/hwid_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_description_black_24dp"
+        android:tint="@color/myPrimaryCardIconColors"
+        />
+
+    <TextView
+        android:id="@+id/proximity_hwid"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintLeft_toRightOf="@+id/hwid_icon"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/hwid_icon"
+        app:layout_constraintBottom_toBottomOf="@id/hwid_icon"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/myPrimaryCardPropertyColor"
+        tools:text="HWID • 01135373db"
+        />
+
+    <!-- Proximity DM -->
+    <ImageView
+        android:id="@+id/dm_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/hwid_icon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:srcCompat="@drawable/ic_bookmark_border_black_24dp"
+        android:tint="@color/myPrimaryCardIconColors"
+        />
+
+    <TextView
+        android:id="@+id/proximity_dm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintLeft_toRightOf="@+id/dm_icon"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/dm_icon"
+        app:layout_constraintBottom_toBottomOf="@id/dm_icon"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/myPrimaryCardPropertyColor"
+        tools:text="DM • 01135373db"
+        />
+</android.support.constraint.ConstraintLayout>

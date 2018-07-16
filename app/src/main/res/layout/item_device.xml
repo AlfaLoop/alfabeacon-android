@@ -99,10 +99,16 @@
             android:layout_marginTop="8dp"
             >
 
-            <!-- IBeaon-->
+            <!-- IBeacon-->
             <include
                 layout="@layout/item_ibeacon"
                 android:id="@+id/ibeacon_item"
+                android:visibility="gone"
+                />
+            <!-- LINE Simple Beacon-->
+            <include
+                layout="@layout/item_lsb"
+                android:id="@+id/lsb_item"
                 android:visibility="gone"
                 />
         </FrameLayout>

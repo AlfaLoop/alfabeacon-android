@@ -48,6 +48,11 @@
                     android:id="@+id/ibeacon_edit"
                     android:visibility="gone"
                     />
+                <!-- LSB -->
+                <include
+                    layout="@layout/item_lsb_edit"
+                    android:id="@+id/lsb_edit"
+                    android:visibility="gone"/>
                 <!-- Radio -->
                 <include
                     layout="@layout/item_radio_edit"

@@ -50,6 +50,7 @@ import com.alfaloop.android.alfabeacon.adapter.DeviceAdapter;
 import com.alfaloop.android.alfabeacon.base.BaseMainFragment;
 import com.alfaloop.android.alfabeacon.base.RecyclerViewEmptySupport;
 import com.alfaloop.android.alfabeacon.models.AppleBeacon;
+import com.alfaloop.android.alfabeacon.models.LINESimpleBeacon;
 import com.alfaloop.android.alfabeacon.models.LeBeacon;
 import com.alfaloop.android.alfabeacon.utility.ParserUtils;
 import com.alfaloop.android.alfabeacon.utility.ScanFilterUtils;
@@ -88,6 +89,7 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
     private RxBleClient rxBleClient;
     private HashMap<String, LeBeacon> mLeBeaconHashMap = new HashMap<String, LeBeacon>();
     private UUID ALFABEACON_UUID = UUID.fromString("0000a55a-0000-1000-8000-00805f9b34fb");
+
     private Rx2Timer mCountTimer = null;
 
     private Disposable scanSubscription;
@@ -365,6 +367,8 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
 
     private void scanResultParser(ScanResult result) {
         boolean hasUuid = false;
+        byte[] lsbHwid = new byte[5];
+        byte[] lsbDm = new byte[13];
         int type = 0;
         int battery = 0;
         ScanRecord record = result.getScanRecord();
@@ -394,17 +398,25 @@ public class ScannerFragment extends BaseMainFragment implements View.OnFocusCha
                         deviceName, result.getBleDevice().getMacAddress(),
                         result.getRssi(), battery, new Date());
 
-                final Pair<Boolean, AppleBeacon> isAppleBeacon = ScanFilterUtils.isBeaconPattern(result);
+                final Pair<Boolean, AppleBeacon> isAppleBeacon = ScanFilterUtils.isAppleBeaconPattern(result);
                 if (isAppleBeacon.first) {
                     beacon.setiBeacon(isAppleBeacon.second);
+                }
+                final Pair<Boolean, LINESimpleBeacon> isLineSimpleBeacon = ScanFilterUtils.isLineSimpleBeaconPattern(result);
+                if (isLineSimpleBeacon.first) {
+                    beacon.setLineSimpleBeacon(isLineSimpleBeacon.second);
                 }
                 mLeBeaconHashMap.put(result.getBleDevice().getMacAddress(), beacon);
             } else {
                 if (previous.getiBeacon() == null) {
                     // parser for the iBeacon
-                    final Pair<Boolean, AppleBeacon> isAppleBeacon = ScanFilterUtils.isBeaconPattern(result);
+                    final Pair<Boolean, AppleBeacon> isAppleBeacon = ScanFilterUtils.isAppleBeaconPattern(result);
                     if (isAppleBeacon.first) {
                         previous.setiBeacon(isAppleBeacon.second);
+                    }
+                    final Pair<Boolean, LINESimpleBeacon> isLineSimpleBeacon = ScanFilterUtils.isLineSimpleBeaconPattern(result);
+                    if (isLineSimpleBeacon.first) {
+                        previous.setLineSimpleBeacon(isLineSimpleBeacon.second);
                     }
                 }
                 previous.setRssi(result.getRssi());

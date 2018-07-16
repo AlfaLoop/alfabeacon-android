@@ -31,6 +31,7 @@ public class LeBeacon {
     private int batteryLevel;
     private Date datetime;
     private AppleBeacon iBeacon = null;
+    private LINESimpleBeacon lineSimpleBeacon = null;
 
     public LeBeacon(int type, String deviceName, String macAddress, int rssi, int battery, Date datetime) {
         this.type = type;
@@ -89,12 +90,21 @@ public class LeBeacon {
         this.datetime = datetime;
     }
 
+
     public AppleBeacon getiBeacon() {
         return iBeacon;
     }
 
     public void setiBeacon(AppleBeacon iBeacon) {
         this.iBeacon = iBeacon;
+    }
+
+    public LINESimpleBeacon getLineSimpleBeacon() {
+        return lineSimpleBeacon;
+    }
+
+    public void setLineSimpleBeacon(LINESimpleBeacon lineSimpleBeacon) {
+        this.lineSimpleBeacon = lineSimpleBeacon;
     }
 
     @Override
@@ -125,6 +135,7 @@ public class LeBeacon {
                 ", batteryLevel=" + batteryLevel +
                 ", datetime=" + datetime +
                 ", iBeacon=" + iBeacon +
+                ", lineSimpleBeacon=" + lineSimpleBeacon +
                 '}';
     }
 }

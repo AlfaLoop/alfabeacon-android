@@ -77,6 +77,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         final LeBeacon item = mFilterItems.get(position);
+        boolean correct = false;
 
         if (item.getType() == LeBeacon.LEBEACON_TYPE_AA) {
             holder.imvBeaconType.setImageResource(R.drawable.ic_beacon_alfa_aa);
@@ -134,8 +135,30 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
             holder.tvIBeaconMajor.setText(String.format("Major • %d", item.getiBeacon().getMajor()));
             holder.tvIBeaconMinor.setText(String.format("Minor • %d", item.getiBeacon().getMinor()));
             holder.tvIBeaconTx.setText(String.format("Tx • %d dBm", item.getiBeacon().getTxInMeter()));
+            correct = true;
         } else {
             holder.vIBeacon.setVisibility(View.GONE);
+        }
+
+        if (item.getLineSimpleBeacon() != null) {
+            holder.vBeaconContainer.setVisibility(View.VISIBLE);
+            holder.vBeaconContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (itemClickListener != null) {
+                        itemClickListener.onConnectClick(item);
+                    }
+                }
+            });
+            holder.vLSBBeacon.setVisibility(View.VISIBLE);
+            holder.tvLSBBeaconHwid.setText(String.format("Hwid • %s", item.getLineSimpleBeacon().getHwid()));
+            holder.tvLSBBeaconDm.setText(String.format("DM • %s", item.getLineSimpleBeacon().getDeviceMessage()));
+            correct = true;
+        }  else {
+            holder.vLSBBeacon.setVisibility(View.GONE);
+        }
+
+        if (!correct) {
             holder.vBeaconContainer.setVisibility(View.GONE);
         }
 
@@ -162,6 +185,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
         private TextView tvIBeaconMajor;
         private TextView tvIBeaconMinor;
         private TextView tvIBeaconTx;
+        private View vLSBBeacon;
+        private TextView tvLSBBeaconHwid;
+        private TextView tvLSBBeaconDm;
         private View vRSSIContainer;
         private TextView tvRssi;
         private View vBatteryContainer;
@@ -184,6 +210,12 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
             tvIBeaconMajor = (TextView) vIBeacon.findViewById(R.id.major);
             tvIBeaconMinor = (TextView) vIBeacon.findViewById(R.id.minor);
             tvIBeaconTx = (TextView) vIBeacon.findViewById(R.id.tx);
+
+            // LSB View
+            vLSBBeacon = (View) vBeaconContainer.findViewById(R.id.lsb_item);
+            // LINE Simple Beacon View
+            tvLSBBeaconHwid = (TextView) vLSBBeacon.findViewById(R.id.proximity_hwid);
+            tvLSBBeaconDm = (TextView) vLSBBeacon.findViewById(R.id.proximity_dm);
 
             // Rssi View
             vRSSIContainer = (View) itemView.findViewById(R.id.rssi_container);

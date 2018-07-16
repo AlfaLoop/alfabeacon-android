@@ -27,7 +27,7 @@
     <string name="ibeacon_edit_title">iBeacon Parameters</string>
     <string name="radio_edit_title">Broadcast Parameters</string>
     <string name="alfa2477s_edit_title">Alfa2477s Parameters</string>
-
+    <string name="lsb_edit_title">LINE Simple Beacon Parameters</string>
 
     <string name="no_scanned_beacons_yet">No scanned beacons yet!</string>
     <string name="empty_state_content">To start scanning for nearby beacons just press the scan button. You\'ll see the scan results appear here.</string>
