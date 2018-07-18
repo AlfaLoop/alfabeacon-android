@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.alfaloop.android.alfabeacon.R;
+import com.alfaloop.android.alfabeacon.fragment.ConnectedFragment;
 import com.alfaloop.android.alfabeacon.models.LeBeacon;
 
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHolder> implements Filterable{
+    public static final String TAG = DeviceAdapter.class.getSimpleName();
 
     public interface OnItemClickListener {
         void onConnectClick(LeBeacon beacon);
@@ -231,8 +233,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             boolean rssiFilterEnable = false;
-            int rssiFilterValue = 0;
             boolean filterStringEnable = false;
+            int rssiFilterValue = 0;
             String filterStringTag = "";
 
             final List<LeBeacon> list = mItems;
@@ -256,6 +258,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
             FilterResults results = new FilterResults();
             final ArrayList<LeBeacon> nlist = new ArrayList<LeBeacon>(count);
             boolean match = false;
+
+            Log.d(TAG, String.format("Filter Tag %s", filterStringTag));
             for (int i = 0; i < count; i++) {
                 match = false;
                 LeBeacon beacon = list.get(i);
@@ -265,13 +269,36 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.MyViewHold
                     }
                 }
                 if (filterStringEnable) {
-                    String major = String.valueOf(beacon.getiBeacon().getMajor());
-                    String minor = String.valueOf(beacon.getiBeacon().getMinor());
-                    String uuid = beacon.getiBeacon().getUuid();
+                    if (beacon.getiBeacon() != null) {
+                        String major = String.valueOf(beacon.getiBeacon().getMajor());
+                        String minor = String.valueOf(beacon.getiBeacon().getMinor());
+                        String uuid = beacon.getiBeacon().getUuid();
+                        Log.d(TAG, String.format("major:%s minor:%s uuid:%s", major, minor, uuid));
+
+                        if  ( major.toUpperCase().contains(filterStringTag.toUpperCase()) ||
+                                minor.toUpperCase().contains(filterStringTag.toUpperCase()) ||
+                                uuid.toUpperCase().contains(filterStringTag.toUpperCase()))
+                        {
+                            match = true;
+                        }
+                    }
+
+                    if (beacon.getLineSimpleBeacon() != null) {
+                        String hwid = String.valueOf(beacon.getLineSimpleBeacon().getHwid());
+                        String dm = String.valueOf(beacon.getLineSimpleBeacon().getDeviceMessage());
+                        Log.d(TAG, String.format("hwid:%s dm:%s", hwid, dm));
+                        if  ( hwid.toUpperCase().contains(filterStringTag.toUpperCase()) ||
+                                dm.toUpperCase().contains(filterStringTag.toUpperCase())) {
+                            match = true;
+                        }
+                    }
                     String macAddress = beacon.getMacAddress();
-                    if  ( !major.contains(filterStringTag) && !minor.contains(filterStringTag) &&
-                            !uuid.contains(filterStringTag) && !macAddress.contains(filterStringTag))
-                    {
+                    if  ( macAddress.toUpperCase().contains(filterStringTag.toUpperCase())) {
+                        Log.d(TAG, String.format("macAddress:%s", macAddress));
+                        match = true;
+                    }
+
+                    if (!match) {
                         continue;
                     }
                 }
